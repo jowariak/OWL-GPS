@@ -1,4 +1,18 @@
 # OWl-GPS
+=======
+
+OWL-GPS is a reference implementation of an open-world, relevance-guided
+online meta-learning framework for geospatial discovery under extreme data scarcity.
+The framework integrates active learning, online meta-learning, and concept-guided
+reasoning to support efficient sampling and prediction in dynamic geospatial settings.
+
+## Status
+
+This repository provides a reference implementation of the OWL-GPS framework
+as described in an accompanying research manuscript.
+
+Expanded documentation and additional modular components will be released
+in a future update.
 
 ## Setup
 ### Dependencies
