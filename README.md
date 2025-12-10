@@ -5,6 +5,18 @@ online meta-learning framework for geospatial discovery under extreme data scarc
 The framework integrates active learning, online meta-learning, and concept-guided
 reasoning to support efficient sampling and prediction in dynamic geospatial settings.
 
+## Paper
+
+**Adapting Actively on the Fly: Relevance-Guided Online Meta-Learning with  
+Latent Concepts for Geospatial Discovery**
+
+Manuscript under double-blind review (ICLR 2026).
+
+This codebase corresponds to the OWL-GPS framework introduced in the paper,
+including relevance-guided sampling and online meta-learning with constrained
+memory and sampling budgets.
+
+
 ## Status
 
 This repository provides a reference implementation of the OWL-GPS framework
@@ -23,9 +35,11 @@ in a future update.
 5. `mim install mmcv-full==1.6.2 -f https://download.openmmlab.com/mmcv/dist/{cuda_version}/{torch_version}/index.html`. Note that pre-built wheels (fast installs without needing to build) only exist for some versions of torch and CUDA. Check compatibilities here: https://mmcv.readthedocs.io/en/v1.6.2/get_started/installation.html
     1. e.g.: `mim install mmcv-full==1.6.2 -f https://download.openmmlab.com/mmcv/dist/cu115/torch1.11.0/index.html`
 
-6. Follow the required packages as mentioned in requirements.txt 
+6. Follow the required packages as mentioned in requirements.txt
 
-#To train our proposed framework, execute:
-
+#### To train our proposed framework, execute:
 python OWL-GPS.py 
+
+
+
 
