@@ -1,4 +1,4 @@
-# OWAGP
+# OWl-GPS
 
 ## Setup
 ### Dependencies
@@ -14,5 +14,5 @@
 
 #To train our proposed framework, execute:
 
-python owags.py 
+python OWL-GPS.py 
 
