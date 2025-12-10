@@ -1,5 +1,4 @@
 # OWl-GPS
-=======
 
 OWL-GPS is a reference implementation of an open-world, relevance-guided
 online meta-learning framework for geospatial discovery under extreme data scarcity.
