@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Adapting Actively on the Fly: Relevance-Guided Online Meta-Learning with Latent Concepts for Geospatial Discovery</title>
+<meta name="description" content="NeurIPS 2026 paper: Adapting Actively on the Fly: Relevance-Guided Online Meta-Learning with Latent Concepts for Geospatial Discovery.">
+<link rel="canonical" href="https://jowariak.github.io/OWL-GPS/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="OWL-GPS">
+<meta property="og:url" content="https://jowariak.github.io/OWL-GPS/">
+<meta property="og:title" content="Adapting Actively on the Fly — OWL-GPS">
+<meta property="og:description" content="NeurIPS 2026 · Relevance-guided online meta-learning for budgeted geospatial and environmental discovery.">
+<meta property="og:image" content="https://jowariak.github.io/OWL-GPS/social-preview-v3.jpg">
+<meta property="og:image:secure_url" content="https://jowariak.github.io/OWL-GPS/social-preview-v3.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="OWL-GPS project preview showing a geospatial landscape with adaptive query regions.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Adapting Actively on the Fly — OWL-GPS">
+<meta name="twitter:description" content="NeurIPS 2026 · Relevance-guided online meta-learning for budgeted geospatial and environmental discovery.">
+<meta name="twitter:image" content="https://jowariak.github.io/OWL-GPS/social-preview-v3.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2eb;--paper:#fbfaf6;--ink:#182228;--muted:#627177;--line:#d9d1c4;--blue:#2f6d93;--green:#4f7257;--rust:#ba6444;--dark:#111b20;--water:#77aac4}
+*{box-sizing:border-box} html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%} body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased} a{color:inherit;text-decoration:none}
+.wrap{width:min(1180px,calc(100% - 40px));margin:auto} nav{position:sticky;top:0;z-index:30;background:rgba(245,242,235,.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(22,33,38,.07)} .nav-inner{height:62px;display:flex;justify-content:space-between;align-items:center}.brand{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.05em}.links{display:flex;gap:4px;align-items:center}.links a{font-size:13px;color:#526167;padding:8px 10px;border-radius:999px}.links a:hover{background:#ebe5db;color:var(--ink)}.links .paper{background:var(--dark);color:white;padding:9px 13px}
+header.hero{padding:66px 0 34px}.venue{font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.09em;font-size:12px;color:var(--blue)} h1{font-family:"Source Serif 4",serif;font-size:clamp(44px,6.2vw,80px);line-height:.98;letter-spacing:-.045em;font-weight:600;margin:15px 0 18px;max-width:1120px}.subtitle{font-size:18px;color:#48565d;line-height:1.65;max-width:820px}
+.hero-meta{margin-top:22px;display:flex;justify-content:space-between;gap:24px;align-items:flex-end;flex-wrap:wrap}.authors{font-size:14px;color:#5a686e;line-height:1.65}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{padding:10px 14px;border-radius:999px;border:1px solid #cfc6b9;background:#fbf8f2;font-size:13px;font-weight:600}.btn.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+.hero-visual{margin-top:34px;background:#d8dfd6;border:1px solid #cfc6b8;box-shadow:0 18px 48px rgba(33,44,48,.08);overflow:hidden;position:relative}.hero-visual .topline{display:flex;justify-content:space-between;gap:16px;padding:14px 16px;border-bottom:1px solid rgba(24,34,40,.09);background:rgba(250,248,242,.9)}.hero-visual .topline .left{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#6d7a80}.hero-visual .topline .right{font-size:12px;color:#5e6b71}
+.hero-grid{display:grid;grid-template-columns:1.18fr .82fr;min-height:610px}
+.mapstage{position:relative;overflow:hidden;background:#c8d6cf}.mapbg{position:absolute;inset:0;background-image:none;background-size:cover;background-position:center center;filter:saturate(1.02) contrast(1.02)}
+.mapbg::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(247,245,239,.12),rgba(25,35,39,.08) 48%,rgba(247,245,239,.12)),radial-gradient(circle at 55% 45%, rgba(255,255,255,.06), transparent 40%)}
+.mapbg::after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 180px rgba(244,241,234,.25), inset 0 0 60px rgba(17,27,32,.10)}
+.mapoverlay{position:absolute;inset:0}
+.cue-card{position:absolute;display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:16px;background:rgba(251,250,246,.84);backdrop-filter:blur(7px);border:1px solid rgba(223,214,199,.95);box-shadow:0 10px 28px rgba(17,27,32,.08)}
+.cue-dot{width:10px;height:10px;border-radius:50%;background:#c56a4b;box-shadow:0 0 0 5px rgba(197,106,75,.14)}
+.cue-card strong{display:block;font-size:13px;color:#243137}.cue-card span{display:block;font-size:12px;color:#66757a;line-height:1.4}
+.c1{left:28px;top:28px;width:210px}.c2{left:28px;bottom:28px;width:228px}.c3{right:26px;top:48px;width:206px}
+.heat{position:absolute;border-radius:50%;background:radial-gradient(circle, rgba(216,121,83,.38), rgba(216,121,83,.12) 42%, rgba(216,121,83,0) 72%);filter:blur(2px);opacity:0;animation:heatPulse 9s ease-in-out infinite}.h1{width:280px;height:280px;left:39%;top:25%;animation-delay:.6s}.h2{width:250px;height:250px;left:21%;top:50%;animation-delay:1.5s}.h3{width:240px;height:240px;left:61%;top:31%;animation-delay:2.3s}
+.pin{position:absolute;width:52px;height:52px;border-radius:50% 50% 50% 0;background:#1d2730;transform:rotate(-45deg);box-shadow:0 10px 18px rgba(17,27,32,.18);opacity:0;animation:pinIn 9s ease infinite}.pin::before{content:attr(data-num);position:absolute;inset:8px;background:#fff;border-radius:50%;display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:18px;color:#1d2730;transform:rotate(45deg)}
+.pin.p1{left:52%;top:40%;animation-delay:3.2s}.pin.p2{left:31%;top:60%;animation-delay:4.0s}.pin.p3{left:70%;top:49%;animation-delay:4.8s}
+.ring{position:absolute;border:2px solid rgba(27,37,43,.55);border-radius:50%;opacity:0;animation:ringPulse 9s ease infinite}.r1{left:53.7%;top:43.4%;animation-delay:3.25s}.r2{left:32.7%;top:63.4%;animation-delay:4.05s}.r3{left:71.7%;top:52.4%;animation-delay:4.85s}
+.r1,.r2,.r3{width:18px;height:18px}
+.map-label{position:absolute;left:28px;top:110px;display:grid;gap:10px;max-width:270px}.tag{padding:10px 14px;border-radius:999px;background:rgba(251,250,246,.80);border:1px solid rgba(223,214,199,.95);backdrop-filter:blur(6px);font-size:13px;color:#516066;width:max-content}
+.tag.t1{animation:fadeCard 9s infinite .2s}.tag.t2{animation:fadeCard 9s infinite 1.4s}.tag.t3{animation:fadeCard 9s infinite 3.0s}
+.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg, transparent, rgba(255,255,255,.34), transparent);opacity:.34;top:12%;animation:scan 10s linear infinite}
+.hero-side{background:rgba(251,250,246,.94);border-left:1px solid rgba(24,34,40,.09);display:flex;flex-direction:column;justify-content:space-between}.side-block{padding:20px 22px;border-bottom:1px solid var(--line)}.side-block:last-child{border-bottom:0}.side-kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#77848a;margin-bottom:8px}.side-title{font-family:"Source Serif 4",serif;font-size:27px;line-height:1.1;margin:0 0 10px;font-weight:600}.side-copy{font-size:14px;line-height:1.7;color:#607076;margin:0}.step-list{display:grid;gap:12px;margin-top:10px}.step{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:flex-start}.step .num{width:30px;height:30px;border-radius:50%;border:1px solid #d2cabc;background:#fff;display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12px;color:#47555c}.step strong{display:block;font-size:14px;margin-bottom:3px}.step span{display:block;font-size:13px;color:#66757b;line-height:1.55}.legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}.legend .item{font-size:12px;color:#68767c;display:flex;align-items:center;gap:8px}.sw{width:11px;height:11px;border-radius:50%}.caption-band{padding:14px 16px;border-top:1px solid rgba(24,34,40,.09);background:#f5f1ea;color:#5b686e;font-size:13px;line-height:1.6}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;min-height:auto}
+.mapstage.clean{background:#d7e1da}
+.hero-mapimg{display:block;width:100%;height:100%;object-fit:cover;object-position:center center}
+.hero-side.clean{background:rgba(251,250,246,.96);border-left:1px solid rgba(24,34,40,.09)}
+@media (max-width: 980px){.hero-grid{grid-template-columns:1fr}.hero-side.clean{border-left:0;border-top:1px solid rgba(24,34,40,.09)}}
+.intro-strip{margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.intro-item{padding:22px 22px 24px 0}.intro-item + .intro-item{border-left:1px solid var(--line);padding-left:22px}.intro-item h3{margin:0 0 7px;font-size:16px}.intro-item p{margin:0;color:#647278;font-size:14px;line-height:1.65}
+section{padding:82px 0}.section-head{display:grid;grid-template-columns:.68fr 1.32fr;gap:50px;align-items:start}.section-id{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7a878c}.section-title{font-family:"Source Serif 4",serif;font-size:clamp(38px,4.7vw,62px);line-height:.98;letter-spacing:-.04em;margin:8px 0 13px;font-weight:600}.section-copy{font-size:17px;color:#5b696f;line-height:1.75;max-width:430px}.content{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}.figure{background:var(--paper);border:1px solid var(--line);padding:14px}.figure img{width:100%;height:auto;display:block}.figure figcaption{border-top:1px solid #e7dfd3;margin-top:12px;padding-top:10px;font-size:12px;color:#69767b;line-height:1.55}.prose{display:grid;gap:20px}.prose-block{padding-top:14px;border-top:1px solid var(--line)}.prose-block h3{margin:0 0 6px;font-size:18px}.prose-block p{margin:0;color:#5f6d73;line-height:1.72;font-size:15px}
+.results{background:#17242a;color:#edf3f5}.results .section-id{color:#9aaeb6}.results .section-copy{color:#aebdc3}.results .section-title{color:#fff}.results .figure{background:#f8f6f0;border-color:#39474d}.results .figure figcaption{color:#aebdc3;border-color:#38454b}.table{border-top:1px solid rgba(255,255,255,.16)}.row{display:grid;grid-template-columns:1.35fr .65fr .65fr;gap:14px;padding:15px 0;border-bottom:1px solid rgba(255,255,255,.10);align-items:baseline}.row.head{font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#91a5ad}.row .name{font-size:14px;color:#d9e5e8}.row .ours,.row .base{font-family:"Source Serif 4",serif;font-size:34px;line-height:1}.row .ours{color:#96d7c8}.row .base{color:#a3b2b8}
+.interpret-grid{margin-top:32px;display:grid;grid-template-columns:1.2fr .8fr;gap:28px}.quote{font-family:"Source Serif 4",serif;font-size:31px;line-height:1.2;border-left:4px solid var(--rust);padding-left:18px;color:#28353b}.quote small{display:block;margin-top:12px;font-family:Inter,sans-serif;font-size:13px;line-height:1.6;color:#68767c}
+.resources{padding:78px 0 100px}.resource-row{display:flex;justify-content:space-between;gap:24px;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 0}.resource-row h3{font-family:"Source Serif 4",serif;font-size:36px;margin:0;font-weight:600} footer{padding:25px 0 45px;color:#7a878c;font-size:12px}.reveal{opacity:0;transform:translateY(14px);transition:.55s ease}.reveal.show{opacity:1;transform:none}
+@keyframes heatPulse{0%,18%{opacity:0}26%,52%{opacity:1}68%,100%{opacity:.22}}
+@keyframes pinIn{0%,30%{opacity:0;transform:translateY(8px) rotate(-45deg) scale(.78)}36%,80%{opacity:1;transform:translateY(0) rotate(-45deg) scale(1)}100%{opacity:.92;transform:translateY(0) rotate(-45deg) scale(1)}}
+@keyframes ringPulse{0%,30%{opacity:0;transform:scale(.7)}40%,58%{opacity:.38;transform:scale(1.9)}100%{opacity:0;transform:scale(2.8)}}
+@keyframes fadeCard{0%,14%{opacity:.4}18%,34%{opacity:1}40%,100%{opacity:.68}}
+@keyframes scan{0%{top:8%}100%{top:92%}}
+@media(max-width:980px){.hero-grid,.section-head,.content,.interpret-grid,.intro-strip{grid-template-columns:1fr}.hero-side{border-left:0;border-top:1px solid rgba(24,34,40,.09)}.intro-item + .intro-item{border-left:0;border-top:1px solid var(--line);padding-left:0}.hero-meta{display:block}.actions{margin-top:16px}.c3{right:auto;left:28px;top:auto;bottom:110px;width:220px}.mapstage{min-height:520px}}
+@media(max-width:680px){.links a:not(.paper){display:none}h1{font-size:46px}.hero-grid{min-height:auto}.legend{grid-template-columns:1fr}.resource-row{display:block}.resource-row .actions{margin-top:16px}.row{grid-template-columns:1fr .6fr .6fr}.mapstage{min-height:440px}.cue-card{transform:scale(.9);transform-origin:left top}.c1{width:180px}.c2{width:195px}.c3{width:180px}.map-label{left:16px;top:95px}}
+
+/* --- animated hero v12 --- */
+.hero-grid-animated{display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:620px}
+.animated-stage{position:relative;isolation:isolate;background:#d7e1da}
+.hero-mapimg{display:block;width:100%;height:100%;object-fit:cover;object-position:center center;animation:heroPan 22s ease-in-out infinite alternate}
+.hero-film{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,22,28,.08),rgba(13,22,28,.14) 55%,rgba(247,245,239,.06));pointer-events:none}
+.hero-anim-overlay{position:absolute;inset:0;pointer-events:none}
+.focus-ring{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.88);box-shadow:0 0 0 14px rgba(255,255,255,.05),0 12px 40px rgba(17,27,32,.12);opacity:0;transform:scale(.82);transition:all .55s ease}
+.ring-a{left:44.5%;top:18.5%;width:112px;height:112px}
+.ring-b{left:20.5%;top:53.5%;width:122px;height:122px}
+.ring-c{left:73.7%;top:60.5%;width:124px;height:124px}
+.query-path{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .45s ease}
+.query-path path{fill:none;stroke:rgba(255,255,255,.92);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:9 10;filter:drop-shadow(0 4px 10px rgba(17,27,32,.16));animation:dashFlow 6s linear infinite}
+.hero-status-card{position:absolute;left:22px;bottom:22px;width:330px;max-width:calc(100% - 44px);padding:14px 16px;border-radius:18px;background:rgba(247,245,239,.88);backdrop-filter:blur(8px);border:1px solid rgba(231,223,211,.96);box-shadow:0 16px 38px rgba(17,27,32,.13)}
+.status-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}.pulse-dot{width:10px;height:10px;border-radius:50%;background:#d26d4d;box-shadow:0 0 0 0 rgba(210,109,77,.35);animation:pulseDot 2.8s infinite}.status-kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#69777d}.status-title{font-size:18px;font-weight:650;color:#213037;margin-bottom:8px;line-height:1.25}.status-copy{display:none;font-size:13px;line-height:1.6;color:#5b6a70;margin:0 0 12px}.status-progress{height:4px;background:#e6ddd0;border-radius:999px;overflow:hidden}.status-progress span{display:block;height:100%;width:25%;background:linear-gradient(90deg,#20303a,#d26d4d);border-radius:999px;transform:translateX(0);transition:transform .45s ease}
+.hero-phase-label{position:absolute;right:22px;bottom:24px;padding:10px 14px;border-radius:999px;background:rgba(18,27,33,.82);color:#f7f5ef;font-size:12px;letter-spacing:.02em;box-shadow:0 12px 28px rgba(17,27,32,.18);opacity:0;transform:translateY(8px);transition:all .45s ease}
+.animated-side .side-title{font-size:29px}.animated-side .side-copy{font-size:14px;line-height:1.72}
+.side-block.compact{padding:18px 20px}
+.animated-step-list{display:grid;gap:10px}
+.animated-step{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px;border:1px solid rgba(224,216,204,.9);border-radius:14px;background:#fcfaf6;opacity:.52;transform:translateX(0);transition:all .35s ease}
+.animated-step .num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid #d6cdbc;color:#47555c;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.animated-step strong{display:block;font-size:14px;margin-bottom:3px;color:#223137}.animated-step span{display:block;font-size:13px;color:#66757b;line-height:1.55}
+.hero-mini-note{background:linear-gradient(180deg,rgba(251,250,246,.96),rgba(247,243,235,.94))}
+#hero-visual.phase-0 .ring-a,#hero-visual.phase-0 .status-copy-0,#hero-visual.phase-0 .phase-label-0,
+#hero-visual.phase-1 .ring-b,#hero-visual.phase-1 .status-copy-1,#hero-visual.phase-1 .phase-label-1,
+#hero-visual.phase-2 .ring-a,#hero-visual.phase-2 .ring-b,#hero-visual.phase-2 .ring-c,#hero-visual.phase-2 .status-copy-2,#hero-visual.phase-2 .phase-label-2,
+#hero-visual.phase-3 .ring-a,#hero-visual.phase-3 .ring-b,#hero-visual.phase-3 .ring-c,#hero-visual.phase-3 .query-path,#hero-visual.phase-3 .status-copy-3,#hero-visual.phase-3 .phase-label-3{display:block;opacity:1;transform:scale(1) translateY(0)}
+#hero-visual.phase-0 .animated-step[data-step="0"],#hero-visual.phase-1 .animated-step[data-step="1"],#hero-visual.phase-2 .animated-step[data-step="2"],#hero-visual.phase-3 .animated-step[data-step="3"]{opacity:1;border-color:#ccbca6;box-shadow:0 10px 22px rgba(17,27,32,.08);transform:translateX(4px);background:#fffdf9}
+#hero-visual.phase-0 .status-progress span{transform:translateX(0)}
+#hero-visual.phase-1 .status-progress span{transform:translateX(100%)}
+#hero-visual.phase-2 .status-progress span{transform:translateX(200%)}
+#hero-visual.phase-3 .status-progress span{transform:translateX(300%)}
+#hero-visual.phase-2 .ring-a,#hero-visual.phase-2 .ring-b,#hero-visual.phase-2 .ring-c,#hero-visual.phase-3 .ring-a,#hero-visual.phase-3 .ring-b,#hero-visual.phase-3 .ring-c{animation:softBeacon 2.8s ease-in-out infinite}
+#hero-visual.phase-2 .ring-b,#hero-visual.phase-3 .ring-b{animation-delay:.35s}#hero-visual.phase-2 .ring-c,#hero-visual.phase-3 .ring-c{animation-delay:.7s}
+#hero-visual.phase-0 .ring-a{box-shadow:0 0 0 14px rgba(87,168,197,.12),0 10px 32px rgba(17,27,32,.10)}
+#hero-visual.phase-1 .ring-b{box-shadow:0 0 0 16px rgba(210,109,77,.10),0 10px 32px rgba(17,27,32,.10)}
+#hero-visual.phase-3 .query-path{opacity:.92}
+@keyframes heroPan{0%{transform:scale(1) translate3d(0,0,0)}50%{transform:scale(1.035) translate3d(-.6%,.4%,0)}100%{transform:scale(1.02) translate3d(.7%,-.35%,0)}}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(210,109,77,.35)}70%{box-shadow:0 0 0 12px rgba(210,109,77,0)}100%{box-shadow:0 0 0 0 rgba(210,109,77,0)}}
+@keyframes softBeacon{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.24),0 12px 34px rgba(17,27,32,.10)}50%{box-shadow:0 0 0 18px rgba(255,255,255,0),0 16px 42px rgba(17,27,32,.12)}}
+@keyframes dashFlow{to{stroke-dashoffset:-38}}
+@media (max-width: 980px){.hero-grid-animated{grid-template-columns:1fr}.animated-stage{min-height:520px}.hero-status-card{width:auto}.hero-phase-label{left:22px;right:auto;bottom:132px}.animated-side{border-top:1px solid rgba(24,34,40,.09);border-left:0}}
+@media (max-width: 640px){.animated-stage{min-height:420px}.hero-status-card{left:14px;right:14px;bottom:14px;max-width:none}.hero-phase-label{left:14px;bottom:146px}.animated-side .side-title{font-size:26px}}
+
+
+/* ===== v13 cleaner animated hero ===== */
+.hero-grid-v13{display:grid;grid-template-columns:minmax(0,1fr) 390px;min-height:680px}
+.v13-mapstage{position:relative;overflow:hidden;background:#d6ded8;isolation:isolate}
+.v13-mapimg{display:block;width:100%;height:100%;object-fit:cover;object-position:center center;animation:v13Drift 26s ease-in-out infinite alternate}
+.v13-film{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,20,26,.06),rgba(14,20,26,.18) 100%)}
+.v13-water-glow{position:absolute;left:31%;top:6%;width:47%;height:46%;background:radial-gradient(circle at 35% 38%, rgba(100,194,255,.13), rgba(100,194,255,0) 64%);mix-blend-mode:screen;opacity:0;transition:opacity .55s ease}
+.v13-heat{position:absolute;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle, rgba(249,111,54,.56) 0%, rgba(241,180,56,.32) 30%, rgba(150,214,80,.18) 58%, rgba(150,214,80,0) 76%);filter:blur(6px);opacity:0;transition:opacity .55s ease, transform .75s ease}
+.v13-heat.h1{left:44%;top:15%}.v13-heat.h2{left:6%;top:50%}.v13-heat.h3{left:72%;top:57%}
+.v13-query-pulse{position:absolute;width:90px;height:90px;border-radius:50%;border:2px solid rgba(255,255,255,.95);box-shadow:0 0 0 0 rgba(255,255,255,.35);opacity:0;transform:scale(.8);transition:opacity .35s ease, transform .35s ease}
+.v13-query-pulse::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(255,255,255,.38)}
+.v13-query-pulse.p1{left:46.5%;top:17.8%}.v13-query-pulse.p2{left:15.5%;top:53.7%}.v13-query-pulse.p3{left:73.5%;top:59.6%}
+.v13-status-pill{position:absolute;left:24px;bottom:24px;max-width:420px;padding:16px 18px;border-radius:16px;background:rgba(247,245,239,.88);backdrop-filter:blur(8px);border:1px solid rgba(232,224,213,.95);box-shadow:0 14px 38px rgba(18,26,31,.12)}
+.v13-status-pill .pill-kicker{font-family:"IBM Plex Mono", monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6d797f;margin-bottom:8px}
+.v13-status-pill .pill-title{display:none;font-size:17px;line-height:1.28;color:#233137;font-weight:650;margin-bottom:6px}
+.v13-status-pill .pill-copy{display:none;font-size:13px;line-height:1.6;color:#5f6d74}
+.v13-phase-caption{position:absolute;right:22px;bottom:22px;display:none;padding:10px 14px;border-radius:999px;background:rgba(15,23,28,.82);color:#f7f5ef;font-size:12px;letter-spacing:.01em;box-shadow:0 12px 28px rgba(18,26,31,.18)}
+.v13-side{background:#f7f4ee;border-left:1px solid rgba(24,34,40,.09);display:flex;flex-direction:column}
+.v13-side-intro,.v13-note{padding:22px 24px}.v13-side-intro{border-bottom:1px solid rgba(24,34,40,.09)}
+.v13-side .side-title{font-size:30px;line-height:1.12;margin:0 0 14px}.v13-side .side-copy{font-size:14px;line-height:1.75;color:#57666c;margin:0}
+.v13-steps{padding:8px 24px 10px}
+.v13-step{display:grid;grid-template-columns:42px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid rgba(24,34,40,.08);opacity:.48;transition:opacity .35s ease, transform .35s ease, border-color .35s ease}
+.v13-step:last-child{border-bottom:0}
+.v13-step .step-no{font-family:"IBM Plex Mono", monospace;font-size:13px;color:#8a969a;padding-top:2px}.v13-step strong{display:block;color:#243239;font-size:15px;margin-bottom:3px}.v13-step span:last-child{display:block;color:#617076;font-size:13px;line-height:1.6}
+.v13-note{margin-top:auto;border-top:1px solid rgba(24,34,40,.09)}
+#hero-visual.phase-0 .title-0,#hero-visual.phase-0 .copy-0,#hero-visual.phase-0 .cap-0,
+#hero-visual.phase-1 .title-1,#hero-visual.phase-1 .copy-1,#hero-visual.phase-1 .cap-1,
+#hero-visual.phase-2 .title-2,#hero-visual.phase-2 .copy-2,#hero-visual.phase-2 .cap-2,
+#hero-visual.phase-3 .title-3,#hero-visual.phase-3 .copy-3,#hero-visual.phase-3 .cap-3,
+#hero-visual.phase-4 .title-4,#hero-visual.phase-4 .copy-4,#hero-visual.phase-4 .cap-4,
+#hero-visual.phase-5 .title-5,#hero-visual.phase-5 .copy-5,#hero-visual.phase-5 .cap-5{display:block}
+#hero-visual.phase-1 .v13-water-glow{opacity:1}
+#hero-visual.phase-2 .v13-water-glow,#hero-visual.phase-2 .v13-heat,
+#hero-visual.phase-3 .v13-water-glow,#hero-visual.phase-3 .v13-heat,
+#hero-visual.phase-4 .v13-water-glow,#hero-visual.phase-4 .v13-heat,
+#hero-visual.phase-5 .v13-water-glow,#hero-visual.phase-5 .v13-heat{opacity:1}
+#hero-visual.phase-2 .v13-heat.h1,#hero-visual.phase-2 .v13-heat.h2,#hero-visual.phase-2 .v13-heat.h3{transform:translate(0,0) scale(1)}
+#hero-visual.phase-3 .v13-heat.h1{transform:translate(-6px,2px) scale(1.03)}
+#hero-visual.phase-3 .v13-heat.h2{transform:translate(4px,-2px) scale(.96);opacity:.82}
+#hero-visual.phase-3 .v13-heat.h3{transform:translate(-3px,5px) scale(.92);opacity:.72}
+#hero-visual.phase-4 .v13-heat.h1{transform:translate(-10px,-4px) scale(.92);opacity:.68}
+#hero-visual.phase-4 .v13-heat.h2{transform:translate(10px,-6px) scale(1.06)}
+#hero-visual.phase-4 .v13-heat.h3{transform:translate(5px,2px) scale(.95);opacity:.7}
+#hero-visual.phase-5 .v13-heat.h1{transform:translate(-12px,-5px) scale(.9);opacity:.56}
+#hero-visual.phase-5 .v13-heat.h2{transform:translate(8px,-7px) scale(.92);opacity:.58}
+#hero-visual.phase-5 .v13-heat.h3{transform:translate(4px,-9px) scale(1.08)}
+#hero-visual.phase-3 .v13-query-pulse.p1,#hero-visual.phase-4 .v13-query-pulse.p1,#hero-visual.phase-5 .v13-query-pulse.p1,
+#hero-visual.phase-4 .v13-query-pulse.p2,#hero-visual.phase-5 .v13-query-pulse.p2,
+#hero-visual.phase-5 .v13-query-pulse.p3{opacity:1;transform:scale(1);animation:v13Pulse 2s ease-out infinite}
+#hero-visual.phase-4 .v13-query-pulse.p2{animation-delay:.35s}#hero-visual.phase-5 .v13-query-pulse.p3{animation-delay:.2s}
+#hero-visual.phase-1 .v13-step[data-step="1"],#hero-visual.phase-2 .v13-step[data-step="2"],#hero-visual.phase-3 .v13-step[data-step="3"],#hero-visual.phase-4 .v13-step[data-step="4"],#hero-visual.phase-5 .v13-step[data-step="4"]{opacity:1;transform:translateX(4px)}
+#hero-visual.phase-5 .v13-step[data-step="3"]{opacity:.85;transform:translateX(4px)}
+@keyframes v13Drift{0%{transform:scale(1) translate3d(0,0,0)}50%{transform:scale(1.02) translate3d(-.4%,.35%,0)}100%{transform:scale(1.035) translate3d(.5%,-.25%,0)}}
+@keyframes v13Pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.42)}70%{box-shadow:0 0 0 20px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+@media (max-width: 1040px){.hero-grid-v13{grid-template-columns:1fr}.v13-side{border-left:0;border-top:1px solid rgba(24,34,40,.09)}.v13-mapstage{min-height:560px}}
+@media (max-width: 640px){.v13-mapstage{min-height:420px}.v13-status-pill{right:14px;left:14px;bottom:14px;max-width:none}.v13-phase-caption{right:14px;bottom:126px}.v13-side .side-title{font-size:27px}.v13-side-intro,.v13-note,.v13-steps{padding-left:18px;padding-right:18px}.v13-step{grid-template-columns:34px 1fr;gap:10px}}
+
+
+/* ===== v14: preserve all 1 / 2 / 3 annotations in the real image ===== */
+.hero-grid-v13{
+  grid-template-columns:minmax(0,1fr) 330px;
+  align-items:stretch;
+  min-height:0;
+}
+.v13-mapstage{
+  min-height:0;
+  aspect-ratio:16 / 9;
+  background:#182227;
+}
+.v13-mapimg{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center center;
+  background:#182227;
+  animation:v13DriftContained 24s ease-in-out infinite alternate;
+}
+.v13-side{
+  max-height:none;
+}
+.v13-side-intro,
+.v13-note{
+  padding:18px 20px;
+}
+.v13-steps{
+  padding:4px 20px 8px;
+}
+.v13-step{
+  padding:12px 0;
+}
+.v13-side .side-title{
+  font-size:27px;
+}
+.v13-side .side-copy{
+  font-size:13px;
+  line-height:1.65;
+}
+.v13-step strong{
+  font-size:14px;
+}
+.v13-step span:last-child{
+  font-size:12.5px;
+  line-height:1.5;
+}
+
+/* Rings repositioned to the original image's 1/2/3 markers */
+.v13-query-pulse.p1{left:49.2%; top:21.0%;}
+.v13-query-pulse.p2{left:20.0%; top:55.0%;}
+.v13-query-pulse.p3{left:75.2%; top:61.0%;}
+
+/* Heat fields track the same three image annotations */
+.v13-heat.h1{left:43%; top:13%;}
+.v13-heat.h2{left:8%; top:47%;}
+.v13-heat.h3{left:69%; top:53%;}
+
+@keyframes v13DriftContained{
+  0%{transform:scale(1) translate3d(0,0,0)}
+  50%{transform:scale(1.008) translate3d(-.15%,.10%,0)}
+  100%{transform:scale(1.004) translate3d(.12%,-.08%,0)}
+}
+
+@media (max-width:1040px){
+  .hero-grid-v13{grid-template-columns:1fr}
+  .v13-mapstage{aspect-ratio:16 / 9;min-height:0}
+}
+
+
+/* ===== v15 cleanup ===== */
+.hero-grid-v13{grid-template-columns:minmax(0,1fr) 300px}
+.v13-mapstage{aspect-ratio:16 / 9; background:#142027}
+.v13-mapimg{object-fit:contain; object-position:center center; background:#142027}
+.v13-side{background:#f8f6f1}
+.v13-side-intro{padding:18px 18px;border-bottom:1px solid rgba(24,34,40,.08)}
+.v13-steps{padding:4px 18px 10px}
+.v13-step{padding:14px 0; opacity:.56}
+.v13-side .side-title{font-size:25px; line-height:1.12; margin:0 0 10px}
+.v13-side .side-copy{font-size:13px; line-height:1.62}
+.v13-step .step-no{font-size:12px}
+.v13-step strong{font-size:14px; margin-bottom:2px}
+.v13-step span:last-child{font-size:12.5px; line-height:1.45}
+.v13-status-pill{max-width:500px; padding:14px 16px}
+.v13-status-pill .pill-title{font-size:16px}
+.v13-status-pill .pill-copy{font-size:12.5px; line-height:1.52}
+.caption-band{font-size:13px; line-height:1.55}
+/* place pulses exactly over 1,2,3 */
+.v13-query-pulse.p1{left:49.4%; top:21.1%}
+.v13-query-pulse.p2{left:19.2%; top:55.2%}
+.v13-query-pulse.p3{left:76.2%; top:61.3%}
+.v13-heat.h1{left:42.7%; top:13.2%}
+.v13-heat.h2{left:4.8%; top:46.8%}
+.v13-heat.h3{left:69.9%; top:54.2%}
+@media (max-width:1040px){.hero-grid-v13{grid-template-columns:1fr}.v13-mapstage{aspect-ratio:16/9}}
+
+
+/* ===== v16 text cleanup ===== */
+.hero-grid-v13{grid-template-columns:minmax(0,1fr) 290px}
+.caption-band{padding:12px 18px}
+
+
+/* ===== v19 hero cleanup ===== */
+.hero-visual{margin-top:34px;overflow:hidden;border:1px solid #cfc6b8;background:#f5f2eb}
+.hero-grid-v13{grid-template-columns:minmax(0,1fr) 290px;min-height:0}
+.v13-mapstage{aspect-ratio:16/9;min-height:0;background:#142027}
+.v13-mapimg{object-fit:contain;object-position:center center;background:#142027}
+.v13-film{background:linear-gradient(180deg,rgba(14,20,26,.015),rgba(14,20,26,.06) 100%)}
+.v13-status-pill{background:rgba(248,246,240,.92);border-color:rgba(230,221,207,.98);box-shadow:0 10px 28px rgba(18,26,31,.10)}
+.v13-phase-caption{background:rgba(15,23,28,.72);font-size:11px;padding:8px 12px}
+.v13-side{background:#f7f4ee}
+.v13-side-intro{padding:18px 18px 16px}
+.v13-side .side-title{font-size:25px;margin:0 0 10px}
+.v13-side .side-copy{font-size:13px;line-height:1.62}
+.v13-steps{padding:0 18px 8px}
+.v13-step{padding:13px 0}
+@media (max-width:1040px){.hero-grid-v13{grid-template-columns:1fr}.v13-mapstage{aspect-ratio:16/9}}
+
+
+/* ===== v20: full-width hero, no overlapping side panel ===== */
+.hero-visual{margin-top:34px;border:1px solid #cfc6b8;background:#f8f5ef;box-shadow:0 18px 48px rgba(33,44,48,.08);overflow:hidden}
+.hero-map-only{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#132029;isolation:isolate}
+.hero-mapimg-v20{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;animation:v20Drift 24s ease-in-out infinite alternate}
+.hero-dim-v20{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,14,18,.03),rgba(8,14,18,.08));pointer-events:none}
+.heat-v20{position:absolute;width:15%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,116,59,.52) 0%,rgba(242,182,58,.28) 30%,rgba(119,194,81,.15) 56%,rgba(119,194,81,0) 74%);filter:blur(7px);opacity:0;transition:opacity .5s ease,transform .8s ease;pointer-events:none}
+.hv1{left:43.8%;top:12.5%}.hv2{left:5.0%;top:46.2%}.hv3{left:70.0%;top:52.8%}
+.pulse-v20{position:absolute;width:7.4%;aspect-ratio:1;border-radius:50%;border:2px solid rgba(255,255,255,.95);opacity:0;transform:scale(.82);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
+.pulse-v20::after{content:'';position:absolute;inset:-12px;border:1px solid rgba(255,255,255,.38);border-radius:50%}
+.pv1{left:45.6%;top:17.0%}.pv2{left:16.5%;top:52.6%}.pv3{left:72.3%;top:58.2%}
+.phase-strip-v20{display:grid;grid-template-columns:repeat(4,1fr);background:#faf7f1;border-top:1px solid #d9d1c4}
+.phase-item-v20{padding:15px 18px 17px;border-right:1px solid #e2dbcf;opacity:.48;transition:opacity .35s ease,background .35s ease,box-shadow .35s ease}
+.phase-item-v20:last-child{border-right:0}.phase-item-v20 span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;color:#8a969b;margin-bottom:5px}.phase-item-v20 strong{display:block;font-size:14px;color:#26343a;margin-bottom:3px}.phase-item-v20 small{display:block;font-size:12px;line-height:1.45;color:#69777c}
+#hero-visual.phase-0 .phase-item-v20[data-step="0"],#hero-visual.phase-1 .phase-item-v20[data-step="1"],#hero-visual.phase-2 .phase-item-v20[data-step="2"],#hero-visual.phase-3 .phase-item-v20[data-step="3"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+#hero-visual.phase-0 .hero-dim-v20{background:linear-gradient(180deg,rgba(8,14,18,.01),rgba(8,14,18,.035))}
+#hero-visual.phase-1 .heat-v20,#hero-visual.phase-2 .heat-v20,#hero-visual.phase-3 .heat-v20{opacity:1}
+#hero-visual.phase-2 .pv1{opacity:1;transform:scale(1);animation:v20Pulse 2.2s ease-out infinite}
+#hero-visual.phase-3 .pv1,#hero-visual.phase-3 .pv2,#hero-visual.phase-3 .pv3{opacity:1;transform:scale(1);animation:v20Pulse 2.4s ease-out infinite}
+#hero-visual.phase-3 .pv2{animation-delay:.35s}#hero-visual.phase-3 .pv3{animation-delay:.7s}
+#hero-visual.phase-3 .hv1{opacity:.48;transform:scale(.88)}#hero-visual.phase-3 .hv2{opacity:.68;transform:scale(.96)}#hero-visual.phase-3 .hv3{opacity:1;transform:scale(1.12)}
+@keyframes v20Drift{0%{transform:scale(1)}50%{transform:scale(1.012) translate3d(-.15%,.08%,0)}100%{transform:scale(1.006) translate3d(.12%,-.06%,0)}}
+@keyframes v20Pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.42)}70%{box-shadow:0 0 0 18px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+@media(max-width:760px){.phase-strip-v20{grid-template-columns:1fr 1fr}.phase-item-v20:nth-child(2){border-right:0}.phase-item-v20:nth-child(-n+2){border-bottom:1px solid #e2dbcf}.phase-item-v20{padding:12px 14px}.phase-item-v20 small{font-size:11.5px}}
+
+
+/* ===== v24: relevance field + subtle attention motion ===== */
+.hero-visual{margin-top:34px;width:100%;max-width:100%;min-width:0;border:1px solid #cfc6b8;background:#f8f5ef;box-shadow:0 18px 48px rgba(33,44,48,.08);overflow:hidden}
+.story22-map{position:relative;width:100%;max-width:100%;min-width:0;aspect-ratio:16/9;overflow:hidden;background:#132029;isolation:isolate}
+.story22-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;transform:none!important;animation:none!important}
+.story22-neutral{opacity:1;filter:saturate(.88) contrast(.98) brightness(.98)}
+.story22-color{opacity:0;transition:opacity 1s ease;filter:saturate(.96) contrast(1.01)}
+.story22-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,15,19,.01),rgba(9,15,19,.08));pointer-events:none;z-index:2}
+
+.story22-legend{position:absolute;left:18px;top:18px;display:flex;gap:8px;z-index:12;max-width:calc(100% - 36px);flex-wrap:wrap}
+.story22-legend span{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:rgba(15,23,28,.72);backdrop-filter:blur(6px);color:#f7f5ef;font-size:11px;border:1px solid rgba(255,255,255,.12);white-space:nowrap}
+.story22-legend i{display:block;width:10px;height:10px;border-radius:50%;font-style:normal;flex:none}
+.story22-legend .lg-heat i{background:radial-gradient(circle,#ff743e 0 32%,#e6b43b 52%,#75bc55 72%,rgba(117,188,85,0) 100%);box-shadow:0 0 10px rgba(255,116,62,.55)}
+.story22-legend .lg-ring i{background:transparent;border:2px solid #fff}
+
+/* A = spatial relevance field. These are soft, overlapping probability-like regions. */
+.story22-heat{position:absolute;width:16%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,103,46,.72) 0%,rgba(241,175,47,.44) 27%,rgba(124,197,74,.24) 53%,rgba(124,197,74,.07) 67%,rgba(124,197,74,0) 78%);filter:blur(8px);opacity:0;transform:translate(-50%,-50%) scale(.82);transition:opacity .85s ease,transform 1.2s cubic-bezier(.2,.7,.2,1);mix-blend-mode:screen;pointer-events:none;z-index:4}
+.story22-heat.h1{left:52.0%;top:27.0%}.story22-heat.h2{left:25.8%;top:59.0%}.story22-heat.h3{left:80.2%;top:67.0%}
+.story22-heat::after{content:'';position:absolute;inset:19%;border-radius:50%;border:1px solid rgba(255,255,255,.19);animation:fieldContour 3.8s ease-in-out infinite}
+.story22-heat::before{content:'';position:absolute;inset:31%;border-radius:50%;border:1px solid rgba(255,255,255,.11);animation:fieldContour 3.8s ease-in-out infinite .55s}
+
+/* Subtle motion helps show how the high-relevance area changes after online updates. */
+.story22-focus{position:absolute;left:52%;top:27%;width:36%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%) scale(.82);background:radial-gradient(circle,rgba(255,239,197,.16) 0%,rgba(255,218,145,.08) 35%,rgba(255,218,145,0) 69%);filter:blur(12px);mix-blend-mode:screen;opacity:0;transition:left 1.45s cubic-bezier(.22,.75,.22,1),top 1.45s cubic-bezier(.22,.75,.22,1),opacity .8s ease,transform 1.2s ease;pointer-events:none;z-index:3}
+
+.story22-dimmer{position:absolute;width:18%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(15,26,31,.28),rgba(15,26,31,.12) 48%,rgba(15,26,31,0) 76%);opacity:0;transform:translate(-50%,-50%);transition:opacity .9s ease;pointer-events:none;z-index:5}
+.story22-dimmer.d1{left:52.0%;top:27.0%}.story22-dimmer.d2{left:25.8%;top:59.0%}
+
+/* Explicit HTML pins cover the baked labels, which fixes the unreadable 3 on desktop/mobile. */
+.story22-pin{position:absolute;width:38px;height:38px;border-radius:50% 50% 50% 0;background:rgba(17,26,33,.94);border:1.5px solid rgba(255,255,255,.92);box-shadow:0 7px 18px rgba(10,16,20,.28);transform:translate(-50%,-50%) rotate(-45deg);z-index:8;display:grid;place-items:center;transition:transform .45s ease,background .45s ease,opacity .45s ease;opacity:.86;pointer-events:none}
+.story22-pin span{transform:rotate(45deg);font:600 15px/1 Inter,system-ui,sans-serif;color:#fff;text-shadow:none}
+.story22-pin.q1{left:52.0%;top:25.5%}.story22-pin.q2{left:25.8%;top:57.4%}.story22-pin.q3{left:80.2%;top:65.4%}
+.story22-ring{position:absolute;width:8%;aspect-ratio:1;border-radius:50%;border:2px solid rgba(255,255,255,.98);opacity:0;transform:translate(-50%,-50%) scale(.78);transition:opacity .45s ease,transform .45s ease;pointer-events:none;box-shadow:0 0 0 0 rgba(255,255,255,.34),0 10px 30px rgba(10,16,20,.12);z-index:7}
+.story22-ring::after{content:'';position:absolute;inset:-13px;border:1px solid rgba(255,255,255,.30);border-radius:50%}
+.story22-ring.r1{left:52.0%;top:25.5%}.story22-ring.r2{left:25.8%;top:57.4%}.story22-ring.r3{left:80.2%;top:65.4%}
+.story22-pinfix{display:none!important}
+
+.story22-card{position:absolute;left:22px;bottom:22px;width:min(455px,calc(100% - 44px));padding:15px 17px;border-radius:16px;background:rgba(248,246,240,.93);backdrop-filter:blur(8px);border:1px solid rgba(230,221,207,.98);box-shadow:0 12px 30px rgba(18,26,31,.11);z-index:11}
+.story22-kicker{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6d797f;margin-bottom:7px}
+.story22-title,.story22-copy{display:none}.story22-title{font-size:17px;line-height:1.27;font-weight:650;color:#223137;margin:0 0 5px}.story22-copy{font-size:13px;line-height:1.55;color:#5e6c73;margin:0}
+.story22-badge{position:absolute;right:18px;bottom:18px;display:none;padding:8px 12px;border-radius:999px;background:rgba(15,23,28,.76);color:#f7f5ef;font-size:11px;box-shadow:0 10px 26px rgba(18,26,31,.16);z-index:11}
+
+.story22-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;min-width:0;background:#faf7f1;border-top:1px solid #d9d1c4}
+.story22-step{min-width:0;padding:14px 17px 16px;border-right:1px solid #e2dbcf;opacity:.45;transition:opacity .3s ease,background .3s ease,box-shadow .3s ease}
+.story22-step:last-child{border-right:0}.story22-step span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px!important;color:#8a969b;margin-bottom:5px}.story22-step strong{display:block;font-size:14px!important;line-height:1.2;color:#26343a;margin-bottom:3px}.story22-step small{display:block;font-size:12px!important;line-height:1.42;color:#69777c}
+
+/* 0 — map is static; only environmental context is visible. */
+#hero-visual.phase-0 .story22-title.t0,#hero-visual.phase-0 .story22-copy.c0,#hero-visual.phase-0 .story22-badge.b0{display:block}
+#hero-visual.phase-0 .story22-step[data-step="0"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+
+/* 1 — compute relevance and emphasize the current highest-value region. */
+#hero-visual.phase-1 .story22-color,#hero-visual.phase-2 .story22-color,#hero-visual.phase-3 .story22-color,#hero-visual.phase-4 .story22-color,#hero-visual.phase-5 .story22-color,#hero-visual.phase-6 .story22-color{opacity:.50}
+#hero-visual.phase-1 .story22-focus{left:52%;top:27%;opacity:1;transform:translate(-50%,-50%) scale(1)}
+#hero-visual.phase-1 .story22-heat.h1{opacity:.92;transform:translate(-50%,-50%) scale(1.08)}
+#hero-visual.phase-1 .story22-heat.h2{opacity:.55;transform:translate(-50%,-50%) scale(.96)}
+#hero-visual.phase-1 .story22-heat.h3{opacity:.36;transform:translate(-50%,-50%) scale(.92)}
+#hero-visual.phase-1 .story22-title.t1,#hero-visual.phase-1 .story22-copy.c1,#hero-visual.phase-1 .story22-badge.b1{display:block}
+#hero-visual.phase-1 .story22-step[data-step="1"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+
+/* 2 — region 1 subtly intensifies, then is queried. */
+#hero-visual.phase-2 .story22-focus{left:52%;top:27%;opacity:1;transform:translate(-50%,-50%) scale(.92)}
+#hero-visual.phase-2 .story22-heat.h1{opacity:1;transform:translate(-50%,-50%) scale(1.16)}
+#hero-visual.phase-2 .story22-heat.h2{opacity:.42;transform:translate(-50%,-50%) scale(.92)}
+#hero-visual.phase-2 .story22-heat.h3{opacity:.28;transform:translate(-50%,-50%) scale(.88)}
+#hero-visual.phase-2 .story22-ring.r1{opacity:1;transform:translate(-50%,-50%) scale(1);animation:story22Pulse 2s ease-out infinite}
+#hero-visual.phase-2 .story22-pin.q1{opacity:1;transform:translate(-50%,-50%) rotate(-45deg) scale(1.10);background:#111a21}
+#hero-visual.phase-2 .story22-title.t2,#hero-visual.phase-2 .story22-copy.c2,#hero-visual.phase-2 .story22-badge.b2{display:block}
+#hero-visual.phase-2 .story22-step[data-step="2"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+
+/* 3 — after adaptation, relevance is recomputed and region 2 becomes stronger. */
+#hero-visual.phase-3 .story22-focus{left:25.8%;top:59%;opacity:1;transform:translate(-50%,-50%) scale(1)}
+#hero-visual.phase-3 .story22-heat.h1{opacity:.28;transform:translate(-50%,-50%) scale(.84)}
+#hero-visual.phase-3 .story22-heat.h2{opacity:1;transform:translate(-50%,-50%) scale(1.13)}
+#hero-visual.phase-3 .story22-heat.h3{opacity:.42;transform:translate(-50%,-50%) scale(.94)}
+#hero-visual.phase-3 .story22-dimmer.d1{opacity:1}
+#hero-visual.phase-3 .story22-title.t3,#hero-visual.phase-3 .story22-copy.c3,#hero-visual.phase-3 .story22-badge.b3{display:block}
+#hero-visual.phase-3 .story22-step[data-step="3"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+
+/* 4 — region 2 becomes the next current query. */
+#hero-visual.phase-4 .story22-focus{left:25.8%;top:59%;opacity:1;transform:translate(-50%,-50%) scale(.92)}
+#hero-visual.phase-4 .story22-heat.h1{opacity:.22;transform:translate(-50%,-50%) scale(.82)}
+#hero-visual.phase-4 .story22-heat.h2{opacity:1;transform:translate(-50%,-50%) scale(1.16)}
+#hero-visual.phase-4 .story22-heat.h3{opacity:.34;transform:translate(-50%,-50%) scale(.90)}
+#hero-visual.phase-4 .story22-ring.r2{opacity:1;transform:translate(-50%,-50%) scale(1);animation:story22Pulse 2s ease-out infinite}
+#hero-visual.phase-4 .story22-pin.q2{opacity:1;transform:translate(-50%,-50%) rotate(-45deg) scale(1.10);background:#111a21}
+#hero-visual.phase-4 .story22-title.t4,#hero-visual.phase-4 .story22-copy.c4,#hero-visual.phase-4 .story22-badge.b4{display:block}
+#hero-visual.phase-4 .story22-step[data-step="2"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+
+/* 5 — another update recomputes relevance and region 3 becomes stronger. */
+#hero-visual.phase-5 .story22-focus{left:80.2%;top:67%;opacity:1;transform:translate(-50%,-50%) scale(1)}
+#hero-visual.phase-5 .story22-heat.h1{opacity:.17;transform:translate(-50%,-50%) scale(.80)}
+#hero-visual.phase-5 .story22-heat.h2{opacity:.31;transform:translate(-50%,-50%) scale(.87)}
+#hero-visual.phase-5 .story22-heat.h3{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+#hero-visual.phase-5 .story22-dimmer.d1,#hero-visual.phase-5 .story22-dimmer.d2{opacity:1}
+#hero-visual.phase-5 .story22-title.t5,#hero-visual.phase-5 .story22-copy.c5,#hero-visual.phase-5 .story22-badge.b5{display:block}
+#hero-visual.phase-5 .story22-step[data-step="3"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+
+/* 6 — region 3 is visibly numbered, centered, and queried. */
+#hero-visual.phase-6 .story22-focus{left:80.2%;top:67%;opacity:1;transform:translate(-50%,-50%) scale(.92)}
+#hero-visual.phase-6 .story22-heat.h1{opacity:.12;transform:translate(-50%,-50%) scale(.78)}
+#hero-visual.phase-6 .story22-heat.h2{opacity:.22;transform:translate(-50%,-50%) scale(.83)}
+#hero-visual.phase-6 .story22-heat.h3{opacity:1;transform:translate(-50%,-50%) scale(1.18)}
+#hero-visual.phase-6 .story22-ring.r3{opacity:1;transform:translate(-50%,-50%) scale(1);animation:story22Pulse 2s ease-out infinite}
+#hero-visual.phase-6 .story22-pin.q3{opacity:1;transform:translate(-50%,-50%) rotate(-45deg) scale(1.10);background:#111a21}
+#hero-visual.phase-6 .story22-title.t6,#hero-visual.phase-6 .story22-copy.c6,#hero-visual.phase-6 .story22-badge.b6{display:block}
+#hero-visual.phase-6 .story22-step[data-step="2"]{opacity:1;background:#fffdf8;box-shadow:inset 0 -3px 0 #b86547}
+
+@keyframes story22Pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.40),0 10px 30px rgba(10,16,20,.14)}70%{box-shadow:0 0 0 19px rgba(255,255,255,0),0 12px 32px rgba(10,16,20,.14)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0),0 10px 30px rgba(10,16,20,.14)}}
+@keyframes fieldContour{0%,100%{opacity:.24;transform:scale(.94)}50%{opacity:.65;transform:scale(1.10)}}
+
+@media(max-width:760px){
+  .hero-visual{max-width:100%;overflow:hidden}
+  .story22-map{aspect-ratio:16/10;min-height:0}
+  .story22-card{left:12px;right:12px;bottom:12px;width:auto;max-width:none;padding:12px 13px;border-radius:13px}
+  .story22-kicker{font-size:9px}.story22-title{font-size:14px!important;line-height:1.25}.story22-copy{font-size:11px!important;line-height:1.45}
+  .story22-badge{right:12px;bottom:105px;font-size:10px;padding:7px 10px}
+  .story22-legend{left:10px;top:10px;gap:6px}.story22-legend span{font-size:9.5px;padding:6px 8px}
+  .story22-pin{width:28px;height:28px}.story22-pin span{font-size:12px}.story22-ring{width:9.5%}.story22-ring::after{inset:-8px}
+  .story22-steps{grid-template-columns:1fr 1fr}
+  .story22-step{padding:10px 12px 11px;border-right:1px solid #e2dbcf;min-height:88px}
+  .story22-step:nth-child(2){border-right:0}.story22-step:nth-child(-n+2){border-bottom:1px solid #e2dbcf}
+  .story22-step span{font-size:9px!important}.story22-step strong{font-size:12px!important}.story22-step small{font-size:10.5px!important;line-height:1.35}
+}
+@media(max-width:480px){
+  .wrap{width:min(100% - 20px,1180px)}
+  .story22-map{aspect-ratio:16/11}
+  .story22-card{padding:10px 11px}.story22-copy{max-width:33ch}
+  .story22-badge{display:none!important}
+  .story22-legend{max-width:70%;flex-direction:column;align-items:flex-start}
+  .story22-step{min-height:82px;padding:9px 10px 10px}
+}
+
+
+.btn.soon{background:#eee9df;border-color:#d8d0c3;color:#7d888d;cursor:default;pointer-events:none}
+</style>
+</head>
+<body>
+<nav><div class="wrap nav-inner"><a class="brand" href="#top">OWL-GPS / NeurIPS 2026</a><div class="links"><a href="#problem">Problem</a><a href="#method">Method</a><a href="#results">Results</a><a href="#interpret">Interpretability</a><a href="paper.pdf" target="_blank" class="paper">Paper ↗</a></div></div></nav>
+<main id="top">
+<header class="hero wrap">
+<div class="venue">NeurIPS 2026</div>
+<h1>Adapting Actively on the Fly: Relevance-Guided Online Meta-Learning with Latent Concepts for Geospatial Discovery</h1>
+<div class="subtitle">A relevance-guided framework for sequential geospatial discovery under sparse labels, strict acquisition budgets, and spatial or temporal distribution shift.</div>
+<div class="hero-meta"><div class="authors">Jowaria Khan · Anindya Sarkar · Yevgeniy Vorobeychik · Elizabeth Bondi-Kelly<br>University of Michigan · Washington University in St. Louis</div><div class="actions"><a class="btn dark" href="https://arxiv.org/abs/2602.17605" target="_blank">Paper</a><a class="btn" href="https://arxiv.org/abs/2602.17605" target="_blank">arXiv</a><span class="btn soon" aria-disabled="true">Code · coming soon</span><a class="btn" href="#results">Results</a></div></div>
+
+<div class="hero-visual reveal phase-0" id="hero-visual">
+  <div class="story22-map">
+    <img class="story22-img story22-neutral" src="assets/site-image-1.png" alt="Real remote-sensing landscape used to illustrate sequential environmental discovery.">
+    <img class="story22-img story22-color" src="assets/site-image-2.png" alt="Environmental landscape with a learned relevance field over candidate regions.">
+    <div class="story22-shade"></div>
+
+    <div class="story22-legend" aria-label="Hero visual legend">
+      <span class="lg-heat"><i></i> learned relevance</span>
+      <span class="lg-ring"><i></i> current query</span>
+    </div>
+
+    <div class="story22-focus"></div>
+    <div class="story22-heat h1"></div><div class="story22-heat h2"></div><div class="story22-heat h3"></div>
+    <div class="story22-dimmer d1"></div><div class="story22-dimmer d2"></div>
+    <div class="story22-pin q1"><span>1</span></div><div class="story22-pin q2"><span>2</span></div><div class="story22-pin q3"><span>3</span></div>
+    <div class="story22-ring r1"></div><div class="story22-ring r2"></div><div class="story22-ring r3"></div>
+
+    <div class="story22-card">
+      <div class="story22-kicker">OWL-GPS LOOP</div>
+      <h3 class="story22-title t0">Represent environmental context for each region.</h3>
+      <p class="story22-copy c0">Domain-informed concepts summarize the environmental context associated with each candidate region.</p>
+      <h3 class="story22-title t1">Estimate region-specific relevance.</h3>
+      <p class="story22-copy c1">The learned relevance representation assigns different importance to different regions under the current model.</p>
+      <h3 class="story22-title t2">Select a high-value region under budget.</h3>
+      <p class="story22-copy c2">The acquisition rule uses the current predictions and relevance representation to choose which region to label next.</p>
+      <h3 class="story22-title t3">Update online and recompute relevance.</h3>
+      <p class="story22-copy c3">The newly acquired label updates the predictor, after which relevance is recomputed for the remaining candidate regions.</p>
+      <h3 class="story22-title t4">Acquire again from the updated model.</h3>
+      <p class="story22-copy c4">The next acquisition reflects the model state after incorporating the latest supervision rather than a fixed ranking made at the start.</p>
+      <h3 class="story22-title t5">Repeat the adaptation step.</h3>
+      <p class="story22-copy c5">Each new observation can change both the predictor and which concepts are most relevant for subsequent acquisition decisions.</p>
+      <h3 class="story22-title t6">Continue sequential acquisition.</h3>
+      <p class="story22-copy c6">The process continues under the remaining query budget: acquire, update online, recompute relevance, and choose again.</p>
+    </div>
+
+    <div class="story22-badge b0">Context</div>
+    <div class="story22-badge b1">Relevance</div>
+    <div class="story22-badge b2">Query 1</div>
+    <div class="story22-badge b3">Adapt + recompute</div>
+    <div class="story22-badge b4">Query 2</div>
+    <div class="story22-badge b5">Adapt + recompute</div>
+    <div class="story22-badge b6">Query 3</div>
+  </div>
+  <div class="story22-steps" aria-label="OWL-GPS acquisition and adaptation loop">
+    <div class="story22-step" data-step="0"><span>01</span><strong>Context</strong><small>Environmental and spatial context describe each candidate region.</small></div>
+    <div class="story22-step" data-step="1"><span>02</span><strong>Relevance</strong><small>A learned field highlights where the model should focus next.</small></div>
+    <div class="story22-step" data-step="2"><span>03</span><strong>Acquire</strong><small>The current best region is queried under a limited budget.</small></div>
+    <div class="story22-step" data-step="3"><span>04</span><strong>Adapt</strong><small>New supervision updates the model and shifts the field.</small></div>
+  </div>
+</div>
+<div class="intro-strip reveal"><div class="intro-item"><h3>Sequential acquisition</h3><p>The learner decides which region to label next under a strict query budget.</p></div><div class="intro-item"><h3>Online adaptation</h3><p>Newly acquired observations update the model and change later acquisition decisions.</p></div><div class="intro-item"><h3>Shared relevance geometry</h3><p>The same learned concept-relevance space guides both sampling and meta-batch construction.</p></div></div>
+</header>
+<section class="wrap" id="problem"><div class="section-head reveal"><div><div class="section-id">01 / problem</div><div class="section-title">From environmental prediction to budgeted discovery.</div><div class="section-copy">OWL-GPS treats environmental deployment as an evolving decision process: candidate regions can be scored, but labels are acquired sequentially and the model keeps adapting as new measurements arrive.</div></div><div class="content" style="margin-top:0"><figure class="figure"><img src="assets/site-image-3.png" alt="OWL-GPS problem formulation from the paper"><figcaption>Problem formulation from the paper: sequential geospatial acquisition with limited supervision and a deployment-time discovery budget.</figcaption></figure><div class="prose"><div class="prose-block"><h3>Costly supervision</h3><p>Many environmental targets require field sampling, laboratory analysis, or other costly measurements, making supervision sparse and expensive.</p></div><div class="prose-block"><h3>Spatial and temporal shift</h3><p>The model may encounter new regions or later years whose environmental conditions differ from the data used to initialize the predictor.</p></div><div class="prose-block"><h3>Acquisition changes adaptation</h3><p>Every query determines which supervision becomes available next; every update changes which region looks most valuable to query afterward.</p></div></div></div></div></section>
+<section class="wrap" id="method"><div class="section-head reveal"><div><div class="section-id">02 / method</div><div class="section-title">A shared relevance representation.</div><div class="section-copy">The method learns region-specific concept relevance and reuses it across prediction, acquisition, and online adaptation.</div></div><div class="content" style="margin-top:0"><figure class="figure"><img src="assets/site-image-4.png" alt="OWL-GPS framework diagram from the paper"><figcaption>The paper’s framework diagram: concept encoding, relevance estimation, active sampling, bounded memory, and online meta-batch formation.</figcaption></figure><div class="prose"><div class="prose-block"><h3>Concept encoder</h3><p>Domain-informed environmental channels are embedded into structured latent concepts.</p></div><div class="prose-block"><h3>Relevance encoder</h3><p>A conditional latent variable represents which concepts matter most for a particular region.</p></div><div class="prose-block"><h3>Two downstream uses</h3><p>Relevance-space structure helps select new regions and also selects diverse observations for subsequent meta-updates.</p></div></div></div></div></section>
+<section class="results" id="results"><div class="wrap" style="padding-top:82px;padding-bottom:82px"><div class="section-head reveal"><div><div class="section-id">03 / results</div><div class="section-title">Evaluation across environmental discovery settings.</div><div class="section-copy">We evaluate OWL-GPS primarily on real-world PFAS contamination discovery, then test temporal transfer and a separate land-cover task to examine portability beyond the primary application.</div></div><div><div class="table"><div class="row head"><div>metric / setting</div><div>ours</div><div>best baseline</div></div><div class="row"><div class="name">2019 PFAS · Success Rate</div><div class="ours">98</div><div class="base">95</div></div><div class="row"><div class="name">2019 PFAS · F-score</div><div class="ours">65</div><div class="base">61</div></div><div class="row"><div class="name">2019 → 2022 · Success Rate</div><div class="ours">86</div><div class="base">81</div></div><div class="row"><div class="name">Land cover · F-score</div><div class="ours">71</div><div class="base">48</div></div></div><figure class="figure" style="margin-top:26px"><img src="assets/site-image-5.png" alt="Search performance and exploration behavior figure from the paper"><figcaption>Search behavior from the paper across the primary environmental case study and transfer settings.</figcaption></figure></div></div></div></section>
+<section class="wrap" id="interpret"><div class="section-head reveal"><div><div class="section-id">04 / interpretability</div><div class="section-title">Relevance is local to the region.</div><div class="section-copy">Different geospatial regions can emphasize different concepts, rather than following one fixed global feature ordering.</div></div><div class="interpret-grid"><figure class="figure"><img src="assets/site-image-6.png" alt="Concept relevance visualization from the paper"><figcaption>Paper visualization of the top concept-relevance channels for correct and incorrect predictions.</figcaption></figure><div class="quote">The same relevance representation supports prediction, acquisition, and online adaptation.</div></div></div></section>
+<section class="resources wrap"><div class="resource-row reveal"><div><div class="venue">NeurIPS 2026</div><h3>Adapting Actively on the Fly</h3><p style="margin:8px 0 0;color:#69767b;font-size:13px">Code and reproducibility materials will be released soon.</p></div><div class="actions"><a class="btn dark" href="https://arxiv.org/pdf/2602.17605" target="_blank">Open PDF</a><a class="btn" href="https://arxiv.org/abs/2602.17605" target="_blank">arXiv</a><span class="btn soon" aria-disabled="true">Code · coming soon</span><a class="btn" href="#top">Back to top</a></div></div></section>
+<footer class="wrap">OWL-GPS · NeurIPS 2026</footer>
+</main>
+<script>const io=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')})},{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));</script>
+
+
+
+
+
+
+
+<script>
+(function(){
+  const hero=document.getElementById('hero-visual');
+  if(!hero) return;
+  const phases=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6'];
+  let i=0;
+  function show(n){phases.forEach(p=>hero.classList.remove(p));hero.classList.add(phases[n]);}
+  show(0);
+  setInterval(()=>{i=(i+1)%phases.length;show(i);},5200);
+})();
+</script>
+</body>
+</html>
